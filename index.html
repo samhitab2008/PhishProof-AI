@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishProof AI | Message Investigator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="brand">
+            <div class="logo">P</div>
+            <div>
+                <h1>PhishProof <span>AI</span></h1>
+                <p>YOUR PERSONAL SECURITY INVESTIGATOR</p>
+            </div>
+        </div>
+        <div class="status">
+            <span class="status-dot"></span>
+            Investigation System
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="hero">
+            <div class="eyebrow">AI-POWERED CYBERSECURITY</div>
+            <h2>Don't trust it.<br><span>Investigate it.</span></h2>
+            <p>
+                Analyze suspicious messages, uncover warning signs,
+                and learn how to protect yourself from phishing.
+            </p>
+        </section>
+
+        <section class="workspace">
+
+            <div class="panel input-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Message Investigator</h3>
+                        <p>Paste the message you want to examine.</p>
+                    </div>
+                    <span class="step-label">STEP 01</span>
+                </div>
+
+                <label for="message">MESSAGE CONTENT</label>
+
+                <textarea
+                    id="message"
+                    maxlength="10000"
+                    placeholder="Paste a suspicious email, internship offer, scholarship message, or SMS here..."
+                ></textarea>
+
+                <div class="input-footer">
+                    <span id="charCount">0 characters</span>
+                    <button id="clearBtn" class="text-button" type="button">
+                        Clear message
+                    </button>
+                </div>
+
+                <button id="analyzeBtn" class="primary-button" type="button">
+                    <span id="buttonText">Investigate Message</span>
+                    <span aria-hidden="true"> →</span>
+                </button>
+                <p id="errorMessage" class="error-message hidden" role="alert"></p>
+
+                <p class="privacy-note">
+                    Message text is sent to Google Gemini for analysis. Use fictional samples;
+                    do not paste passwords, OTPs, or private information.
+                </p>
+            </div>
+
+            <div class="panel results-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Investigation Report</h3>
+                        <p>Evidence and recommended next steps.</p>
+                    </div>
+                    <span class="step-label">STEP 02</span>
+                </div>
+
+                <div id="emptyState" class="empty-state">
+                    <div class="shield">⌑</div>
+                    <h3>Awaiting Investigation</h3>
+                    <p>
+                        Your analysis will appear here after you submit
+                        a message for investigation.
+                    </p>
+                    <div class="mini-tags">
+                        <span>Warning signs</span>
+                        <span>Risk assessment</span>
+                        <span>Safety guidance</span>
+                    </div>
+                </div>
+
+                <div id="loadingState" class="loading-state hidden">
+                    <div class="loader"></div>
+                    <h3>Investigating message...</h3>
+                    <p>Checking the text for potential warning signs.</p>
+                </div>
+
+                <div id="resultState" class="result-state hidden">
+                    <div id="riskBadge" class="risk-badge">RISK NOT AVAILABLE</div>
+                    <p id="analysisSourceNotice" class="analysis-source-notice hidden" role="status"></p>
+                    <h3 id="resultTitle">Investigation complete</h3>
+                    <p id="explanation" class="result-explanation"></p>
+
+                    <div id="riskMeter" class="risk-meter" data-risk="medium" role="img" aria-label="Risk level: Medium Risk">
+                        <div class="risk-meter-heading">
+                            <span>ASSESSMENT</span>
+                            <strong id="riskMeterLabel">Medium Risk</strong>
+                        </div>
+                        <div class="risk-meter-track" aria-hidden="true">
+                            <span class="risk-segment"></span>
+                            <span class="risk-segment"></span>
+                            <span class="risk-segment"></span>
+                        </div>
+                        <div class="risk-meter-scale" aria-hidden="true">
+                            <span>LOW</span><span>MEDIUM</span><span>HIGH</span>
+                        </div>
+                        <p id="riskMeterCaption"></p>
+                    </div>
+
+                    <h4>Message warning signs</h4>
+                    <ul id="signalsList" class="signals-list"></ul>
+
+                    <section class="url-section" aria-labelledby="urlHeading">
+                        <h4 id="urlHeading">Visible URL checks</h4>
+                        <p class="url-caveat">Formatting observations only, not a reputation check or proof that a URL is malicious. Up to 8 URLs are shown.</p>
+                        <ul id="urlsList" class="urls-list"></ul>
+                    </section>
+
+                    <div class="recommendation">
+                        <h4>Recommended next steps</h4>
+                        <ul id="recommendationsList"></ul>
+                    </div>
+
+                    <section class="final-summary" aria-labelledby="summaryHeading">
+                        <h4 id="summaryHeading">Final summary</h4>
+                        <p id="summaryText"></p>
+                    </section>
+
+                    <p id="disclaimer" class="disclaimer"></p>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="panel history-panel" aria-labelledby="historyHeading">
+            <div class="panel-heading">
+                <div>
+                    <h3 id="historyHeading">Recent checks</h3>
+                    <p>Private, on-device history for this browser.</p>
+                </div>
+                <button id="clearHistoryBtn" class="text-button" type="button">Clear history</button>
+            </div>
+            <p id="historyPrivacy" class="history-privacy">Only dates, risk levels, and aggregate counts are saved here. Message text and URLs are not stored.</p>
+            <p id="historyStatus" class="history-empty">No saved checks yet.</p>
+            <ol id="historyList" class="history-list"></ol>
+        </section>
+
+        <section class="bottom-grid">
+            <div class="info-card">
+                <span class="info-number">01</span>
+                <h3>Detect warning signs</h3>
+                <p>Identify suspicious language and potentially risky requests.</p>
+            </div>
+            <div class="info-card">
+                <span class="info-number">02</span>
+                <h3>Understand the evidence</h3>
+                <p>Learn why a message may deserve closer inspection.</p>
+            </div>
+            <div class="info-card">
+                <span class="info-number">03</span>
+                <h3>Take safer action</h3>
+                <p>Get practical steps to verify a message before responding.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>PhishProof AI · Hackathon Prototype · Not a guarantee of message safety</p>
+        </footer>
+
+    </main>
+
+    <script>
+        const messageInput = document.getElementById("message");
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const buttonText = document.getElementById("buttonText");
+        const clearBtn = document.getElementById("clearBtn");
+        const errorMessage = document.getElementById("errorMessage");
+        const emptyState = document.getElementById("emptyState");
+        const loadingState = document.getElementById("loadingState");
+        const resultState = document.getElementById("resultState");
+        const historyList = document.getElementById("historyList");
+        const historyStatus = document.getElementById("historyStatus");
+        const historyKey = "phishproof.analysis-history.v1";
+        const maxHistoryEntries = 10;
+        const analysisTimeoutMs = 30000;
+
+        messageInput.addEventListener("input", () => {
+            document.getElementById("charCount").textContent =
+                `${messageInput.value.length} characters`;
+        });
+
+        function setError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.toggle("hidden", !message);
+        }
+
+        function validHistoryEntry(entry) {
+            return entry &&
+                typeof entry.date === "string" &&
+                ["High Risk", "Medium Risk", "Low Risk"].includes(entry.status) &&
+                Number.isInteger(entry.signalCount) &&
+                Number.isInteger(entry.urlCount) &&
+                Number.isInteger(entry.urlWarningCount);
+        }
+
+        function renderHistory(entries) {
+            historyList.replaceChildren();
+            historyStatus.classList.toggle("hidden", entries.length > 0);
+
+            if (!entries.length) {
+                historyStatus.textContent = "No saved checks yet.";
+                return;
+            }
+
+            entries.forEach((entry) => {
+                const item = document.createElement("li");
+                item.className = "history-item";
+
+                const summary = document.createElement("div");
+                const level = document.createElement("strong");
+                level.className = `history-risk ${entry.status.toLowerCase().replace(" ", "-")}`;
+                level.textContent = entry.status;
+
+                const details = document.createElement("p");
+                details.textContent =
+                    `${entry.signalCount} message warning(s) · ${entry.urlCount} URL(s) · ${entry.urlWarningCount} URL formatting flag(s)`;
+
+                const date = document.createElement("time");
+                date.dateTime = entry.date;
+                date.textContent = new Date(entry.date).toLocaleString();
+
+                summary.append(level, details);
+                item.append(summary, date);
+                historyList.appendChild(item);
+            });
+        }
+
+        function loadHistory() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(historyKey) || "[]");
+                if (!Array.isArray(saved)) {
+                    throw new Error("Saved history has an invalid format.");
+                }
+                const entries = saved.filter(validHistoryEntry).slice(0, maxHistoryEntries);
+                renderHistory(entries);
+                return entries;
+            } catch {
+                historyStatus.textContent =
+                    "Browser storage is unavailable; recent checks will not be saved.";
+                historyStatus.classList.remove("hidden");
+                return [];
+            }
+        }
+
+        let historyEntries = loadHistory();
+
+        function saveHistory(result) {
+            const entry = {
+                date: new Date().toISOString(),
+                status: result.status,
+                signalCount: result.signals.length,
+                urlCount: result.urls.length,
+                urlWarningCount: result.urls.filter((url) => url.signals.length > 0).length
+            };
+            historyEntries = [entry, ...historyEntries].slice(0, maxHistoryEntries);
+
+            try {
+                localStorage.setItem(historyKey, JSON.stringify(historyEntries));
+                renderHistory(historyEntries);
+            } catch {
+                historyStatus.textContent =
+                    "This check was analyzed, but browser storage is unavailable so it was not saved.";
+                historyStatus.classList.remove("hidden");
+            }
+        }
+
+        function appendListItems(list, items, emptyText) {
+            list.replaceChildren();
+            const values = items.length ? items : [emptyText];
+            values.forEach((text) => {
+                const item = document.createElement("li");
+                item.textContent = text;
+                list.appendChild(item);
+            });
+        }
+
+        function renderWarningSigns(signals) {
+            const list = document.getElementById("signalsList");
+            list.replaceChildren();
+
+            if (!signals.length) {
+                const item = document.createElement("li");
+                item.className = "signal-empty";
+                item.textContent = "No supported warning signs were identified in the message text.";
+                list.appendChild(item);
+                return;
+            }
+
+            signals.forEach((signal) => {
+                const item = document.createElement("li");
+                item.className = "signal-card";
+
+                const title = document.createElement("strong");
+                title.textContent = signal.title;
+
+                const explanation = document.createElement("p");
+                explanation.textContent = signal.explanation;
+
+                item.append(title, explanation);
+                list.appendChild(item);
+            });
+        }
+
+        function showUrlFindings(urls) {
+            const list = document.getElementById("urlsList");
+            list.replaceChildren();
+
+            if (!urls.length) {
+                const item = document.createElement("li");
+                item.className = "url-empty";
+                item.textContent = "No recognizable URL was detected in this message.";
+                list.appendChild(item);
+                return;
+            }
+
+            urls.forEach((url) => {
+                const item = document.createElement("li");
+                item.className = "url-card";
+
+                const host = document.createElement("strong");
+                host.textContent = url.host;
+
+                const visibleUrl = document.createElement("code");
+                visibleUrl.textContent = url.url;
+
+                const verification = document.createElement("p");
+                verification.className = "url-verification";
+                verification.textContent = url.verification;
+
+                const findings = document.createElement("ul");
+                findings.className = "url-signals";
+                appendListItems(
+                    findings,
+                    url.signals,
+                    "No obvious formatting flags were detected. This does not establish that the URL is safe."
+                );
+
+                item.append(host, visibleUrl, findings, verification);
+                list.appendChild(item);
+            });
+        }
+
+        clearBtn.addEventListener("click", () => {
+            messageInput.value = "";
+            document.getElementById("charCount").textContent = "0 characters";
+            messageInput.focus();
+            setError("");
+            resultState.classList.add("hidden");
+            loadingState.classList.add("hidden");
+            emptyState.classList.remove("hidden");
+        });
+
+        document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+            try {
+                localStorage.removeItem(historyKey);
+                historyEntries = [];
+                renderHistory(historyEntries);
+            } catch {
+                historyStatus.textContent =
+                    "Browser storage is unavailable; saved history could not be cleared.";
+                historyStatus.classList.remove("hidden");
+            }
+        });
+
+        analyzeBtn.addEventListener("click", async () => {
+            const message = messageInput.value.trim();
+            if (!message) {
+                setError("Please paste a message before starting the investigation.");
+                messageInput.focus();
+                return;
+            }
+
+            if (message.length > 10000) {
+                setError("Messages must be 10,000 characters or fewer.");
+                messageInput.focus();
+                return;
+            }
+
+            setError("");
+            analyzeBtn.disabled = true;
+            buttonText.textContent = "Investigating...";
+            analyzeBtn.setAttribute("aria-busy", "true");
+            emptyState.classList.add("hidden");
+            resultState.classList.add("hidden");
+            loadingState.classList.remove("hidden");
+
+            let timeoutId;
+            try {
+                const controller = new AbortController();
+                timeoutId = window.setTimeout(
+                    () => controller.abort(),
+                    analysisTimeoutMs
+                );
+                const response = await fetch("/api/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message }),
+                    signal: controller.signal
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    throw new Error(
+                        `The server returned an invalid response (HTTP ${response.status}). Please try again.`
+                    );
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Unable to analyze the message.");
+                }
+
+                if (
+                    !["High Risk", "Medium Risk", "Low Risk"].includes(data.status) ||
+                    !Array.isArray(data.signals) ||
+                    data.signals.some((signal) =>
+                        !signal ||
+                        typeof signal.title !== "string" ||
+                        typeof signal.explanation !== "string"
+                    ) ||
+                    typeof data.explanation !== "string" ||
+                    typeof data.summary !== "string" ||
+                    !Array.isArray(data.recommendations) ||
+                    !Array.isArray(data.urls) ||
+                    !["gemini", "rule-based-fallback"].includes(data.analysisSource) ||
+                    typeof data.analysisLabel !== "string" ||
+                    data.urls.some((url) =>
+                        typeof url.url !== "string" ||
+                        typeof url.host !== "string" ||
+                        !Array.isArray(url.signals) ||
+                        typeof url.verification !== "string"
+                    )
+                ) {
+                    throw new Error(
+                        "The analysis server returned an invalid response. Please try again."
+                    );
+                }
+
+                const usingFallback = data.analysisSource === "rule-based-fallback";
+                const sourceNotice = document.getElementById("analysisSourceNotice");
+                sourceNotice.textContent = data.analysisLabel;
+                sourceNotice.dataset.source = data.analysisSource;
+                sourceNotice.classList.remove("hidden");
+
+                document.getElementById("riskBadge").textContent = data.status.toUpperCase();
+                document.getElementById("resultTitle").textContent =
+                    data.status === "High Risk" ? "Several warning signs need attention" :
+                    data.status === "Medium Risk" ? "Some warning signs deserve a closer look" :
+                    "Few warning signs identified";
+                document.getElementById("riskMeter").dataset.risk =
+                    data.status.toLowerCase().replace(" ", "-");
+                document.getElementById("riskMeter").setAttribute(
+                    "aria-label",
+                    `${usingFallback ? "Rule-based" : "AI-assessed"} risk level: ${data.status}`
+                );
+                document.getElementById("riskMeterLabel").textContent = data.status;
+                document.getElementById("riskMeterCaption").textContent =
+                    usingFallback
+                        ? "Basic rule-based result only. It does not verify sender identity or URL reputation."
+                        : data.status === "Low Risk"
+                        ? "Fewer warning signs were identified. This is not proof that the message is safe."
+                        : "This is an AI assessment of visible indicators, not a verified finding of malicious activity.";
+
+                document.getElementById("explanation").textContent = data.explanation;
+                renderWarningSigns(data.signals);
+                showUrlFindings(data.urls);
+                appendListItems(
+                    document.getElementById("recommendationsList"),
+                    data.recommendations,
+                    "Verify unexpected requests independently before acting."
+                );
+                document.getElementById("summaryText").textContent = data.summary;
+                document.getElementById("disclaimer").textContent =
+                    data.note || "AI assessments can be wrong and cannot guarantee safety.";
+
+                resultState.classList.remove("hidden");
+                saveHistory(data);
+
+            } catch (error) {
+                emptyState.classList.remove("hidden");
+                if (error.name === "AbortError") {
+                    setError("Analysis timed out after 30 seconds. Please try again.");
+                } else if (error instanceof TypeError) {
+                    setError("Could not reach the analysis server. Check that it is running and try again.");
+                } else {
+                    setError(error.message || "Unable to analyze the message. Please try again.");
+                }
+            } finally {
+                if (timeoutId !== undefined) {
+                    window.clearTimeout(timeoutId);
+                }
+                loadingState.classList.add("hidden");
+                analyzeBtn.disabled = false;
+                analyzeBtn.removeAttribute("aria-busy");
+                buttonText.textContent = "Investigate Message";
+            }
+        });
+    </script>
+
+</body>
+</html>
